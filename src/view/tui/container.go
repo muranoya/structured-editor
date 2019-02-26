@@ -1,14 +1,19 @@
 package tui
 
-import "github.com/muranoya/structured-editor/src/format"
+import (
+	"github.com/muranoya/structured-editor/src/format"
+	"github.com/rivo/tview"
+)
 
 type containerType uint
 
 const (
-	// None is not container data type, this type is used in function call
+	// None is not container type
 	None containerType = 0
+	// Root represents the root node
+	Root containerType = 1 << iota
 	// String represents the node which has string value
-	String containerType = 1 << iota
+	String
 	// Boolean represents the node which has bool value
 	Boolean
 	// Integer represents the node which has integer value
@@ -30,14 +35,16 @@ const (
 )
 
 type container struct {
-	data    format.DataObject
-	conType containerType
+	data       format.DataObject
+	conType    containerType
+	parentNode *tview.TreeNode
 }
 
 // newContainer creates new instance of container
-func newContainer(data format.DataObject, ct containerType) *container {
+func newContainer(pNode *tview.TreeNode, data format.DataObject, ct containerType) *container {
 	return &container{
-		data:    data,
-		conType: ct,
+		data:       data,
+		conType:    ct,
+		parentNode: pNode,
 	}
 }

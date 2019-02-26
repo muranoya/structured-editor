@@ -54,7 +54,7 @@ func decode(obj interface{}) (format.DataObject, error) {
 		arrayObj := format.NewDataArray()
 		for _, v := range val {
 			if valObj, err := decode(v); err == nil {
-				*arrayObj.GetValue() = append(*arrayObj.GetValue(), valObj)
+				arrayObj.AppendValue(valObj)
 			} else {
 				return nil, errors.Cause(err)
 			}
@@ -76,7 +76,7 @@ func decode(obj interface{}) (format.DataObject, error) {
 }
 
 // Decode a text to a DataObject
-func (p *CodecJSON) Decode(reader io.Reader) (format.DataObject, error) {
+func (p *CodecJSON) Decode(reader io.Reader) (*format.DataRoot, error) {
 	var obj interface{}
 	decoder := json.NewDecoder(reader)
 	decoder.UseNumber()
@@ -84,7 +84,11 @@ func (p *CodecJSON) Decode(reader io.Reader) (format.DataObject, error) {
 		return nil, errors.Cause(err)
 	}
 
-	return decode(obj)
+	data, err := decode(obj)
+	if err != nil {
+		return nil, err
+	}
+	return format.NewDataRoot(data), nil
 }
 
 // Encode a DataObject to a text

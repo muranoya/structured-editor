@@ -4,6 +4,8 @@ package format
 type DataType uint
 
 const (
+	// ROOT is a root object
+	ROOT = 0
 	// MAP is a map object
 	MAP DataType = 1 << iota
 	// ARRAY is a array object
