@@ -5,9 +5,9 @@ type DataType uint
 
 const (
 	// ROOT is a root object
-	ROOT = 0
+	ROOT DataType = iota
 	// MAP is a map object
-	MAP DataType = 1 << iota
+	MAP
 	// ARRAY is a array object
 	ARRAY
 	// STRING is a string object
@@ -25,4 +25,5 @@ const (
 // DataObject represents the structured-data object
 type DataObject interface {
 	Type() DataType
+	ParentNode() DataObject
 }

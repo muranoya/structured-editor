@@ -8,14 +8,16 @@ import (
 
 // DataArray represents the array
 type DataArray struct {
-	value []DataObject
+	value  []DataObject
+	parent DataObject
 }
 
 // NewDataArray creates new instance DataArray
-func NewDataArray() *DataArray {
-	dat := DataArray{}
-	dat.value = make([]DataObject, 0, 10)
-	return &dat
+func NewDataArray(parent DataObject) *DataArray {
+	return &DataArray{
+		value:  make([]DataObject, 0, 10),
+		parent: parent,
+	}
 }
 
 // Type returns the data type
@@ -24,13 +26,19 @@ func (p DataArray) Type() DataType {
 }
 
 // GetValue returns object value
-func (p *DataArray) GetValue() []DataObject {
+func (p DataArray) GetValue() []DataObject {
 	return p.value
 }
 
 // SetValue sets object value
 func (p *DataArray) SetValue(val []DataObject) {
 	p.value = val
+}
+
+// ParentNode returns the parent node
+// The parent of array value node is the array node.
+func (p DataArray) ParentNode() DataObject {
+	return p.parent
 }
 
 // RemoveValue removes data object has the index of idx

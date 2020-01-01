@@ -4,14 +4,16 @@ import "fmt"
 
 // DataFloat represents the float
 type DataFloat struct {
-	value float64
+	value  float64
+	parent DataObject
 }
 
 // NewDataFloat creates new instance DataFloat
-func NewDataFloat(val float64) *DataFloat {
-	dat := DataFloat{}
-	dat.value = val
-	return &dat
+func NewDataFloat(val float64, parent DataObject) *DataFloat {
+	return &DataFloat{
+		value:  val,
+		parent: parent,
+	}
 }
 
 // Type returns the data type
@@ -27,6 +29,11 @@ func (p *DataFloat) GetValue() float64 {
 // SetValue sets object value
 func (p *DataFloat) SetValue(val float64) {
 	p.value = val
+}
+
+// ParentNode returns the parent node
+func (p DataFloat) ParentNode() DataObject {
+	return p.parent
 }
 
 func (p DataFloat) String() string {

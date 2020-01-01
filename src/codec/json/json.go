@@ -29,31 +29,31 @@ func isIntegerString(s string) bool {
 	return rexp.MatchString(s)
 }
 
-func decode(obj interface{}) (format.DataObject, error) {
+func decode(parent format.DataObject, obj interface{}) (format.DataObject, error) {
 	if obj == nil {
-		return format.NewDataNull(), nil
+		return format.NewDataNull(parent), nil
 	} else if val, ok := obj.(bool); ok {
-		return format.NewDataBoolean(val), nil
+		return format.NewDataBoolean(val, parent), nil
 	} else if val, ok := obj.(json.Number); ok {
 		if isIntegerString(val.String()) {
 			i64, err := val.Int64()
 			if err != nil {
 				return nil, errors.Wrapf(err, "Cannot convert number to int64 from \"%v\"", val.String())
 			}
-			return format.NewDataInteger(i64), nil
+			return format.NewDataInteger(i64, parent), nil
 		}
 
 		f64, err := val.Float64()
 		if err != nil {
 			return nil, errors.Wrapf(err, "Cannot convert number to float64 from \"%v\"", val.String())
 		}
-		return format.NewDataFloat(f64), nil
+		return format.NewDataFloat(f64, parent), nil
 	} else if val, ok := obj.(string); ok {
-		return format.NewDataString(val), nil
+		return format.NewDataString(val, parent), nil
 	} else if val, ok := obj.([]interface{}); ok {
-		arrayObj := format.NewDataArray()
+		arrayObj := format.NewDataArray(parent)
 		for _, v := range val {
-			if valObj, err := decode(v); err == nil {
+			if valObj, err := decode(arrayObj, v); err == nil {
 				arrayObj.AppendValue(valObj)
 			} else {
 				return nil, errors.Cause(err)
@@ -61,10 +61,11 @@ func decode(obj interface{}) (format.DataObject, error) {
 		}
 		return arrayObj, nil
 	} else if val, ok := obj.(map[string]interface{}); ok {
-		mapObj := format.NewDataMap()
+		mapObj := format.NewDataMap(parent)
 		for k, v := range val {
-			if valObj, err := decode(v); err == nil {
-				mapObj.GetValue()[*format.NewDataString(k)] = valObj
+			keyObj := format.NewDataString(k, mapObj)
+			if valObj, err := decode(keyObj, v); err == nil {
+				mapObj.GetValue()[*keyObj] = valObj
 			} else {
 				return nil, errors.Cause(err)
 			}
@@ -84,11 +85,13 @@ func (p *CodecJSON) Decode(reader io.Reader) (*format.DataRoot, error) {
 		return nil, errors.Cause(err)
 	}
 
-	data, err := decode(obj)
+	rootObj := format.NewDataRoot()
+	data, err := decode(rootObj, obj)
 	if err != nil {
 		return nil, err
 	}
-	return format.NewDataRoot(data), nil
+	rootObj.SetValue(data)
+	return rootObj, nil
 }
 
 // Encode a DataObject to a text

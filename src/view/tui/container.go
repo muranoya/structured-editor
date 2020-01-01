@@ -35,16 +35,16 @@ const (
 )
 
 type container struct {
-	data       format.DataObject
 	conType    containerType
+	dataNode   format.DataObject
 	parentNode *tview.TreeNode
 }
 
 // newContainer creates new instance of container
-func newContainer(pNode *tview.TreeNode, data format.DataObject, ct containerType) *container {
+func newContainer(parentNode *tview.TreeNode, ct containerType, node format.DataObject) *container {
 	return &container{
-		data:       data,
 		conType:    ct,
-		parentNode: pNode,
+		dataNode:   node,
+		parentNode: parentNode,
 	}
 }

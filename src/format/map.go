@@ -4,14 +4,16 @@ import "fmt"
 
 // DataMap represents the map
 type DataMap struct {
-	value map[DataString]DataObject
+	value  map[DataString]DataObject
+	parent DataObject
 }
 
 // NewDataMap creates new instance DataMap
-func NewDataMap() *DataMap {
-	dat := DataMap{}
-	dat.value = map[DataString]DataObject{}
-	return &dat
+func NewDataMap(parent DataObject) *DataMap {
+	return &DataMap{
+		value:  map[DataString]DataObject{},
+		parent: parent,
+	}
 }
 
 // Type returns the data type
@@ -27,6 +29,11 @@ func (p *DataMap) GetValue() map[DataString]DataObject {
 // SetValue sets object value
 func (p *DataMap) SetValue(val map[DataString]DataObject) {
 	p.value = val
+}
+
+// ParentNode returns the parent node
+func (p DataMap) ParentNode() DataObject {
+	return p.parent
 }
 
 func (p DataMap) String() string {
